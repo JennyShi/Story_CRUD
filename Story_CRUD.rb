@@ -9,7 +9,7 @@ Description: This is a simple script for create/update/delete user stories from 
   
 =end
 
-require 'rally_api_emc_sso' 
+require 'rally_api' 
 
 class Story_CRUD
   def initialize (workspace,project)
@@ -21,6 +21,8 @@ class Story_CRUD
     #==================== Making a connection to Rally ====================
     config = {:base_url => "https://rally1.rallydev.com/slm"}
     config = {:workspace => workspace}
+    config[:username] = "username"
+    config[:password] ="password"
     config[:project] = project
     config[:headers] = headers #from RallyAPI::CustomHttpHeader.new()
 
@@ -48,7 +50,7 @@ class Story_CRUD
     result
   end
 
-  def find_userstory(row)
+  def find_userstory_by_id(row)
     query = RallyAPI::RallyQuery.new()
     query.type = "HierarchicalRequirement"
     query.fetch = "Name,FormattedID"
@@ -69,6 +71,33 @@ class Story_CRUD
     results
   end
 
+  def find_userstory_by_name(row)
+    query = RallyAPI::RallyQuery.new()
+    query.type = "story"
+    query.fetch = "Name"
+    query.query_string = "(Name = \"#{row["Name"]}\")"
+    results = @rally.find(query)
+  
+ # result.first.read
+ # puts result.first.read.Children.size
+  
+    if (results.length != 0)
+      results.each do |res|
+        res.read
+        puts "Find: #{res.Name}"
+        puts "FormattedID: #{res.FormattedID}"
+        puts "Project: #{res.Project}"
+        puts "Description: #{res.Description}"
+        puts "Owner: #{res.Owner}"
+        puts "State: #{res.State}"
+        puts "\n"
+      end
+    else
+      puts "No such user story #{row["Name"]}"
+    end
+    results
+  end
+  
   def create_userstory(row)
     puts "Creating..."
     results = find_project(row["Project"])
@@ -93,7 +122,7 @@ class Story_CRUD
   puts "Updating..."
   #result = find_project(row["Project"])
   if(find_project(row["Project"])!= nil)
-    result = find_userstory(row)
+    result = find_userstory_by_id(row)
     if(result.length != 0)
       @userstory = result.first
       puts @userstory["_ref"]
@@ -143,7 +172,7 @@ def delete_userstory(row)
   puts "Managing row #{@iCount}"
 
   if(find_project(row["Project"]) != nil)
-    result = find_userstory(row)
+    result = find_userstory_by_id(row)
     if(result.length != 0)
       @userstory = result.first
       puts @userstory["_ref"]

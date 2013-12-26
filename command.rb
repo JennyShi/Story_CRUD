@@ -1,4 +1,4 @@
-require 'rally_api_emc_sso'
+require 'rally_api'
 require 'csv'
 
 require './Story_CRUD.rb'
@@ -38,7 +38,7 @@ def start
      #   puts @rows[@iCount]
       #  puts @rows.length
         while @iCount < @rows.length
-          result = story_crud.find_userstory(@rows[@iCount])
+          result = story_crud.find_userstory_by_id(@rows[@iCount])
           if (result.length != 0)
             puts "Can't create , the same userstory exists!"
             puts "\n"
@@ -76,17 +76,31 @@ def start
         puts "Project #{@project}"
         puts "\n"
         
+        puts "Find 1.By Name\t2.By FormattedID "
+        request = gets.chomp
+        
         story_crud = Story_CRUD.new(@workspace, @project)
         
+        case request
+        when "1"
         @iCount = 0 #@iCount = 0 or rows.length-1
      #   puts @rows[@iCount]
       #  puts @rows.length
         while @iCount < @rows.length
-          story_crud.find_userstory(@rows[@iCount])
+          story_crud.find_userstory_by_name(@rows[@iCount])
           @iCount += 1
           puts "\n"
         end
-        
+        when "2"
+        @iCount = 0 #@iCount = 0 or rows.length-1
+     #   puts @rows[@iCount]
+      #  puts @rows.length
+        while @iCount < @rows.length
+          story_crud.find_userstory_by_id(@rows[@iCount])
+          @iCount += 1
+          puts "\n"
+        end
+        end
       when "4" #delete
         read_file(file_name)
         puts @rows
@@ -108,7 +122,7 @@ def start
       end
               
    when "2"
-     @workspace = "Workspace 1"
+     @workspace = "USD"
       
       puts "Enter Project:"      
       @project = gets.chomp
@@ -158,7 +172,7 @@ def start
           @iCount += 1
         end
         
-      when "3" #read
+       when "3" #read
         read_file(file_name)
         puts @rows
         
@@ -166,15 +180,30 @@ def start
         puts "Project #{@project}"
         puts "\n"
         
+        puts "Find 1.By Name\t2.By FormattedID "
+        request = gets.chomp
+        
         story_crud = Story_CRUD.new(@workspace, @project)
         
+        case request
+        when "1"
         @iCount = 0 #@iCount = 0 or rows.length-1
      #   puts @rows[@iCount]
       #  puts @rows.length
         while @iCount < @rows.length
-          story_crud.find_userstory(@rows[@iCount])
+          story_crud.find_userstory_by_name(@rows[@iCount])
           @iCount += 1
           puts "\n"
+        end
+        when "2"
+        @iCount = 0 #@iCount = 0 or rows.length-1
+     #   puts @rows[@iCount]
+      #  puts @rows.length
+        while @iCount < @rows.length
+          story_crud.find_userstory_by_id(@rows[@iCount])
+          @iCount += 1
+          puts "\n"
+        end
         end
         
       when "4" #delete
